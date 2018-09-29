@@ -31,55 +31,55 @@ do
 	1)	
 		if [ ! -d "ca-authority" ] 
 		then
-			mkdir -p ca-authority/{conf,private,public,signed-keys,CRL} reqs 
-			cd ca-authority
-			echo "01" > conf/serial
-			touch conf/index
-			cp ../openssl.cnf conf/
+			echo "CRIANDO ESTRUTURA DE DIRETORIOS..."
+			mkdir -p ca-authority/{conf,private,public,cacerts,signed-keys,CRL,OCSP/log,reqs}
+			echo ""
+
+			echo "01" > ca-authority/conf/serial
+			touch ca-authority/conf/index
+			cp openssl.cnf ca-authority/conf
 
 			echo "GERANDO CHAVE PRIVADA..."
-			openssl genrsa -des3 -out private/root.key 2048
+			openssl genrsa -des3 -out ca-authority/private/root.key 2048
 			echo ""
 
-			echo "GERANDO CERTIFICADO DA CA..."
-			openssl req -x509 -new -nodes -config conf/openssl.cnf -days 1825 -key private/root.key -out public/root.crt -extensions v3_OCSP
+			echo "GERANDO CERTIFICADO DA AC..."
+			openssl req -x509 -new -nodes -config ca-authority/conf/openssl.cnf -days 1825 -key ca-authority/private/root.key -out ca-authority/public/root.crt -extensions v3_OCSP
 			echo ""
 
-			chmod 400 private
-			cd ..
-			cat ca-authority/private/root.key ca-authority/public/root.crt > cacert.pem
+			cat ca-authority/private/root.key ca-authority/public/root.crt > ca-authority/cacerts/cacert.pem
 		else 
 			echo "DIRETORIO 'ca-authority' JA EXISTE"
 		fi
 		;;
 	2)
-		openssl genrsa -des3 -out ocsp.key 2048
-		openssl req -new -key ocsp.key -nodes -out ocsp.csr
-		openssl ca -batch -config ca-authority/conf/openssl.cnf -in ocsp.csr -out ocsp.cer -extensions v3_OCSP
-		rm ocsp.csr
+		echo "GERANDO CSR OCSP..."
+		openssl genrsa -des3 -out ca-authority/OCSP/ocsp.key 2048
+		openssl req -new -key ca-authority/OCSP/ocsp.key -nodes -out ca-authority/OCSP/ocsp.csr
+		echo ""
+
+		echo "GERANDO CERTIFICADO OCSP..."
+		openssl ca -batch -config ca-authority/conf/openssl.cnf -in ca-authority/OCSP/ocsp.csr -out ca-authority/OCSP/ocsp.cer -extensions v3_OCSP
 		;;
 	3)
 		echo -n "Nome de Arquivo para o Cliente: "
 		read CLIENTE
 
 		echo "GERANDO CHAVE PRIVADA..."
-		openssl genrsa -des3 -out $CLIENTE.key 2048
+		openssl genrsa -des3 -out ca-authority/reqs/$CLIENTE.key 2048
 		echo ""
 
-		echo "GERANDO CERTIFICADO DO CLIENTE..."
-		openssl req -new -key $CLIENTE.key -nodes -out $CLIENTE.csr 
+		echo "GERANDO CSR DO CLIENTE..."
+		openssl req -new -key ca-authority/reqs/$CLIENTE.key -nodes -out ca-authority/reqs/$CLIENTE.csr 
 		echo ""
 
-		mv $CLIENTE.key $CLIENTE.csr ./reqs
 		echo "Chave Privada e CSR Criados no Diretorio 'reqs'"
 		;;
 	4)
 		echo -n "Nome do Arquivo Gerado para o Cliente: "
-		read -e CLIENTE
+		read CLIENTE
 
-		openssl ca -batch -config ca-authority/conf/openssl.cnf -in reqs/$CLIENTE.csr -out reqs/$CLIENTE.cer -extensions v3_OCSP
-		#openssl pkcs12 -export -in reqs/$CLIENTE.cer -inkey reqs/$CLIENTE.key -out reqs/$CLIENTE.p12 
-		#openssl pkcs12 -in reqs/$CLIENTE.p12 -nodes -out reqs/$CLIENTE.pem
+		openssl ca -batch -config ca-authority/conf/openssl.cnf -in ca-authority/reqs/$CLIENTE.csr -out ca-authority/reqs/$CLIENTE.cer -extensions v3_OCSP
 		;;
 	5)
 		echo -n "Serial do Certificado: "
@@ -91,10 +91,10 @@ do
 		echo -n "Serial do Certificado: "
 		read -e SERIAL
 
-		openssl ocsp -CAfile cacert.pem -issuer cacert.pem -cert ca-authority/signed-keys/$SERIAL.pem -url http://auth-certs.com:8888 -resp_text
+		openssl ocsp -CAfile ca-authority/cacerts/cacert.pem -issuer ca-authority/cacerts/cacert.pem -cert ca-authority/signed-keys/$SERIAL.pem -url http://localhost:8888 -resp_text
 		;;
 	7)
-		openssl ca -config ca-authority/conf/openssl.cnf -gencrl -out ./ca-authority/CRL/ca-authority-crl.crl
+		openssl ca -config ca-authority/conf/openssl.cnf -gencrl -out ca-authority/CRL/ca-authority.crl
 		;;
 	8)
 		read -e -p "Certificado: " CERTIFICADO
@@ -109,7 +109,7 @@ do
 		openssl rsa -in $CH_PRIVADA -check
 		;;
 	11)
-		openssl crl -text -noout -in ca-authority/CRL/ca-authority-crl.crl
+		openssl crl -text -noout -in ca-authority/CRL/ca-authority.crl
 		;;
 	0) 
 		exit

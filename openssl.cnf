@@ -1,6 +1,6 @@
 [ req ]
 default_bits            = 2048
-default_keyfile         = ./private/root.key
+default_keyfile         = ca-authority/private/root.key
 default_md              = sha256
 prompt                  = no
 distinguished_name      = root_ca_distinguished_name
@@ -23,12 +23,12 @@ basicConstraints = CA:true
 default_ca              = CA_default
 
 [ CA_default ]
-dir                     = ./ca-authority
-new_certs_dir           = ./ca-authority/signed-keys/
-database                = ./ca-authority/conf/index
-certificate             = ./ca-authority/public/root.crt
-serial                  = ./ca-authority/conf/serial
-private_key             = ./ca-authority/private/root.key
+dir                     = ca-authority
+new_certs_dir           = ca-authority/signed-keys/
+database                = ca-authority/conf/index
+certificate             = ca-authority/public/root.crt
+serial                  = ca-authority/conf/serial
+private_key             = ca-authority/private/root.key
 x509_extensions         = usr_cert
 name_opt                = ca_default
 cert_opt                = ca_default
@@ -47,11 +47,11 @@ commonName              = supplied
 emailAddress            = optional
 
 [ usr_cert ]
-basicConstraints=CA:FALSE
-subjectKeyIdentifier=hash
-authorityKeyIdentifier=keyid,issuer:always
-nsCaRevocationUrl     = auth-certs.com/auth-certs-ca.pem
-authorityInfoAccess = OCSP;URI:http://auth-certs.com
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+nsCaRevocationUrl = localhost/ca-authority.crl
+authorityInfoAccess = OCSP;URI:http://localhost
 
 [ crl_ext ]
 authorityKeyIdentifier=keyid:always,issuer:always

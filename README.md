@@ -1,7 +1,6 @@
 # ca_authority
 
 ================= CA AUTHORITY ================
-
 [1] Criar Estrutura da CA
 [2] Criar Certificado do Servidor OCSP
 [3] Criar Requisicao e Chave do Cliente

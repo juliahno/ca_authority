@@ -9,7 +9,7 @@
 [8] Visualizar Certificado (CRT/CER)
 [9] Visualizar Requisicao (CSR)
 [10] Visualizar Chave Privada (KEY)
-[11] Visualizar LCR
+[11] Visualizar CRL
 -----------------------------------------------
 [0] Sair
 ===============================================

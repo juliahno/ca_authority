@@ -1,0 +1,62 @@
+[ req ]
+default_bits            = 2048
+default_keyfile         = ./private/root.key
+default_md              = sha256
+prompt                  = no
+distinguished_name      = root_ca_distinguished_name
+x509_extensions = v3_ca
+
+[ root_ca_distinguished_name ]
+countryName             = BR
+stateOrProvinceName     = DF
+localityName            = Brasilia
+0.organizationName      = JIA Certs
+commonName              = jiacerts.com
+emailAddress            = certificadosd@jiacerts.com
+
+[ v3_ca ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer:always
+basicConstraints = CA:true
+
+[ ca ]
+default_ca              = CA_default
+
+[ CA_default ]
+dir                     = ./jiacerts-ca
+new_certs_dir           = ./jiacerts-ca/signed-keys/
+database                = ./jiacerts-ca/conf/index
+certificate             = ./jiacerts-ca/public/root.crt
+serial                  = ./jiacerts-ca/conf/serial
+private_key             = ./jiacerts-ca/private/root.key
+x509_extensions         = usr_cert
+name_opt                = ca_default
+cert_opt                = ca_default
+default_crl_days        = 30
+default_days            = 365
+default_md              = sha256
+preserve                = no
+policy                  = policy_match
+
+[ policy_match ]
+countryName             = match
+stateOrProvinceName     = supplied
+organizationName        = supplied
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ usr_cert ]
+basicConstraints=CA:FALSE
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+nsCaRevocationUrl     = jiacerts.com/jiacerts-ca-crl.pem
+authorityInfoAccess = OCSP;URI:http://jiacerts.com
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+
+[ v3_OCSP ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = OCSPSigning

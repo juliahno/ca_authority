@@ -10,9 +10,9 @@ x509_extensions = v3_ca
 countryName             = BR
 stateOrProvinceName     = DF
 localityName            = Brasilia
-0.organizationName      = JIA Certs
-commonName              = jiacerts.com
-emailAddress            = certificadosd@jiacerts.com
+0.organizationName      = Auth Certs
+commonName              = auth-certs.com
+emailAddress            = certificates@auth-certs.com
 
 [ v3_ca ]
 subjectKeyIdentifier=hash
@@ -23,12 +23,12 @@ basicConstraints = CA:true
 default_ca              = CA_default
 
 [ CA_default ]
-dir                     = ./jiacerts-ca
-new_certs_dir           = ./jiacerts-ca/signed-keys/
-database                = ./jiacerts-ca/conf/index
-certificate             = ./jiacerts-ca/public/root.crt
-serial                  = ./jiacerts-ca/conf/serial
-private_key             = ./jiacerts-ca/private/root.key
+dir                     = ./ca-authority
+new_certs_dir           = ./ca-authority/signed-keys/
+database                = ./ca-authority/conf/index
+certificate             = ./ca-authority/public/root.crt
+serial                  = ./ca-authority/conf/serial
+private_key             = ./ca-authority/private/root.key
 x509_extensions         = usr_cert
 name_opt                = ca_default
 cert_opt                = ca_default
@@ -50,8 +50,8 @@ emailAddress            = optional
 basicConstraints=CA:FALSE
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid,issuer:always
-nsCaRevocationUrl     = jiacerts.com/jiacerts-ca-crl.pem
-authorityInfoAccess = OCSP;URI:http://jiacerts.com
+nsCaRevocationUrl     = auth-certs.com/auth-certs-ca.pem
+authorityInfoAccess = OCSP;URI:http://auth-certs.com
 
 [ crl_ext ]
 authorityKeyIdentifier=keyid:always,issuer:always
